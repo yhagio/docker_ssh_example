@@ -1,0 +1,35 @@
+FROM node:10.13.0-alpine
+
+# Set working directory to store app dependencies
+WORKDIR /app
+
+# Copy package json files
+COPY ./package*.json ./
+
+# Install bash, git, openssh
+RUN apk update && apk upgrade && apk add --no-cache bash git openssh
+
+
+# Use ssh keys passed to be able to install private dependencies
+ARG KEY
+ARG PUB
+# RUN echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config
+# RUN  echo "    IdentityFile ~/.ssh/id_rsa" >> /etc/ssh/ssh_config
+RUN mkdir /root/.ssh/
+RUN touch /root/.ssh/id_rsa /root/.ssh/id_rsa.pub /root/.ssh/known_hosts
+RUN echo "$KEY" > /root/.ssh/id_rsa
+RUN echo "$PUB" > /root/.ssh/id_rsa.pub
+
+RUN ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts
+
+RUN chmod -R 700 /root/.ssh/
+
+RUN ssh -T git@bitbucket.org
+
+RUN npm i
+
+# Copy rest of files
+COPY ./ ./
+
+# Remove ssh from image
+RUN rm -rf /root/.ssh/

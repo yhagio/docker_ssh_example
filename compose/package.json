@@ -1,0 +1,14 @@
+{
+  "name": "compose",
+  "version": "1.0.0",
+  "description": "Just list of Docker commands",
+  "scripts": {
+    "stop": "docker stop $(docker ps -a -q)",
+    "build": "docker-compose -f docker-compose.install.yml build --build-arg KEY=\"$(cat ~/.ssh/id_rsa)\" --build-arg PUB=\"$(cat ~/.ssh/id_rsa.pub)\"",
+    "up": "docker-compose up",
+    "down": "docker-compose down",
+    "rm:all": "npm run stop && docker rm $(docker ps -a -q) && docker rmi $(docker images -q)"
+  },
+  "author": "Yuichi Hagio",
+  "license": "ISC"
+}
